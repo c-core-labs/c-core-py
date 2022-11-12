@@ -1,33 +1,31 @@
-from c_core_py.geohash import get_geohash
+from google.cloud import firestore
+
+from c_core_py.geohash import get_geohash, update_geohash_index
+from c_core_py.examples import example_item_convergence
+from c_core_py.firestore import get_document
 
 
-item = {'collection': 'floe-edge',
- 'stac_version': '1.0.0-beta.2',
- 'id': '20201019T121115_20201025T121027_000025_fasticemotion',
- 'assets': {'raster_tiles': {'title': 'Raster tiles',
-   'href': 'https://c-core-ottawa.s3.amazonaws.com/tms/20201019T121115_20201025T121027_000025_fasticemotion-spo.tif/{z}/{x}/{y}.png'},
-  'speckle_tracking': {'size': 15617254,
-   'href': 'https://s3.ca-central-1.amazonaws.com/c-core-ottawa/20201019T121115_20201025T121027_000025_fasticemotion-spo.tif'}},
- 'type': 'Feature',
- 'links': [{'href': 'https://s3.ca-central-1.amazonaws.com/c-core-catalog-dev/floe-edge/arctic/2020/20201019T121115_20201025T121027_000025_fasticemotion.json',
-   'rel': 'self'},
-  {'rel': 'parent', 'href': './../catalog.json'},
-  {'href': '././../catalog.json', 'rel': 'collection'},
-  {'href': './././../catalog.json', 'rel': 'root'}],
- 'bbox': [-86.62753763168617,
-  -72.93358927262537,
-  69.62986045070944,
-  73.72844542132746],
- 'properties': {'ic:datetime_interval': '2020-10-19T12:11:15Z--2020-10-25T12:10:27Z',
-  'rp:acquisition_time': None,
-  'ic:datetime_start': '2020-10-19T12:11:15Z',
-  'datetime': '2020-10-19T12:11:15Z',
-  'rp:publish_time': '2020-10-28T16:01:43.236008',
-  'ic:datetime_end': '2020-10-25T12:10:27Z',
-  'ic:pair_id': 25}}
+db = firestore.Client.from_service_account_json("credentials.json")
 
 
 def test_get_geohash():
-    geohash = get_geohash(item)
+    geohash = get_geohash(example_item_convergence)
 
     assert geohash == "eb1f"
+
+
+def test_update_geohash_index():
+    collection = "test"
+    collection_index = "test-index"
+    date = example_item_convergence["properties"]["datetime"].split("T")[0]
+
+    result = update_geohash_index(example_item_convergence, "test", db=db)
+    geohash = result["id"]
+
+    assert geohash == "eb1f"
+
+    document_index = get_document(
+        document_id=geohash, collection_id=collection_index, db=db
+    )
+
+    assert document_index["properties"][date] > 0
