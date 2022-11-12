@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "c_core_py", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 libgeohash = "^0.1.1"
 shapely = "^1.8.5.post1"
 pystac = "^1.6.1"
