@@ -15,6 +15,6 @@ def get_geohash(item: Item, precision: int = 4, invert_bbox: bool = False):
     longitude = polygon.centroid.coords.xy[0][0]
     latitude = polygon.centroid.coords.xy[1][0]
 
-    geohash = pygeohash.encode(latitude=latitude, longitude=longitude, precision=precision)
+    geohash = libgeohash.encode(lat=latitude, lon=longitude, precision=precision)
 
     return geohash
