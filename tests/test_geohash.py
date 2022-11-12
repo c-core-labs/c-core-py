@@ -14,15 +14,21 @@ def test_get_geohash():
     assert geohash == "eb1f"
 
 
+def test_get_geohash_invert_bbox():
+    geohash = get_geohash(example_item_convergence, invert_bbox=True)
+
+    assert geohash == "fhxr"
+
+
 def test_update_geohash_index():
     collection = "test"
     collection_index = "test-index"
     date = example_item_convergence["properties"]["datetime"].split("T")[0]
 
-    result = update_geohash_index(example_item_convergence, "test", db=db)
+    result = update_geohash_index(example_item_convergence, "test", db=db, invert_bbox=True)
     geohash = result["id"]
 
-    assert geohash == "eb1f"
+    assert geohash == "fhxr"
 
     document_index = get_document(
         document_id=geohash, collection_id=collection_index, db=db

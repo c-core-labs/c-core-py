@@ -40,12 +40,14 @@ def update_geohash_index(
     *,
     index_collection: Optional[str] = None,
     datetime_property: str = "datetime",
+    precision: int = 4,
+    invert_bbox: bool = False,
 ):
     """Update database with new item's geohash and date."""
     if not index_collection:
         index_collection = f"{collection}-index"
 
-    geohash = get_geohash(item)
+    geohash = get_geohash(item, precision=precision, invert_bbox=invert_bbox)
     datetime_string = item["properties"][datetime_property]
     date = datetime_string.split("T")[0]
     geohash_bounds = get_geohash_bounds(geohash)
