@@ -15,7 +15,7 @@ def get_geohash(item: Item, precision: int = 4, invert_bbox: bool = False):
     bbox = item["bbox"]
     if invert_bbox:
         bbox = [bbox[0], bbox[2], bbox[1], bbox[3]]
-        
+
     polygon = shapely.geometry.box(*bbox, ccw=True)
     longitude = polygon.centroid.coords.xy[0][0]
     latitude = polygon.centroid.coords.xy[1][0]
@@ -29,15 +29,21 @@ def get_geohash_bounds(geohash):
     """Return the bounds of a geohash."""
     polygon = libgeohash.geohash_to_polygon([geohash])
     bounds = polygon.bounds
-    
+
     return bounds
 
 
-def update_geohash_index(item: Item, collection: str, db: google.cloud.firestore_v1.client.Client, *, index_collection: Optional[str] = None, datetime_property: str = "datetime"):
+def update_geohash_index(
+    item: Item,
+    collection: str,
+    db: google.cloud.firestore_v1.client.Client,
+    *,
+    index_collection: Optional[str] = None,
+    datetime_property: str = "datetime",
+):
     """Update database with new item's geohash and date."""
     if not index_collection:
         index_collection = f"{collection}-index"
-
 
     geohash = get_geohash(item)
     datetime_string = item["properties"][datetime_property]
@@ -45,7 +51,9 @@ def update_geohash_index(item: Item, collection: str, db: google.cloud.firestore
     geohash_bounds = get_geohash_bounds(geohash)
 
     # Get geohash index
-    document_index = get_document(document_id=geohash, collection_id=index_collection, db=db)
+    document_index = get_document(
+        document_id=geohash, collection_id=index_collection, db=db
+    )
 
     # Create or update geohash index
     if not document_index:
@@ -54,7 +62,7 @@ def update_geohash_index(item: Item, collection: str, db: google.cloud.firestore
             "bbox": geohash_bounds,
             "properties": {
                 date: 1,
-            }
+            },
         }
     else:
         if not date in document_index["properties"].keys():
@@ -63,7 +71,11 @@ def update_geohash_index(item: Item, collection: str, db: google.cloud.firestore
             document_index["properties"][date] = document_index["properties"][date] + 1
 
     # Set geohash index
-    set_document(document_id=geohash, document=document_index, collection_id=index_collection, db=db)
-    
+    set_document(
+        document_id=geohash,
+        document=document_index,
+        collection_id=index_collection,
+        db=db,
+    )
+
     return document_index
-    

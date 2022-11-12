@@ -18,12 +18,14 @@ def test_update_geohash_index():
     collection = "test"
     collection_index = "test-index"
     date = example_item_convergence["properties"]["datetime"].split("T")[0]
-    
+
     result = update_geohash_index(example_item_convergence, "test", db=db)
     geohash = result["id"]
 
-    assert geohash== "eb1f"
-    
-    document_index = get_document(document_id=geohash, collection_id=collection_index, db=db)
+    assert geohash == "eb1f"
+
+    document_index = get_document(
+        document_id=geohash, collection_id=collection_index, db=db
+    )
 
     assert document_index["properties"][date] > 0

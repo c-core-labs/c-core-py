@@ -12,3 +12,8 @@ To run a specific test within a test module:
 poetry run python -m pytest -s -v tests/test_geohash.py::test_get_geohash
 ```
 
+## Style
+Auto format with [black](https://github.com/psf/black):
+```
+poetry run python -m black **/*.py
+```
